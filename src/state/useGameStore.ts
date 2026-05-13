@@ -33,6 +33,7 @@ export interface GameStore {
   confirmTurn: () => { resultKind: "BUST" | "VICTORY" | "CONTINUE" };
   resolveBust: () => void;
   resetGame: () => void;
+  rematch: () => void;
 
   // Time travel
   undoLastEvent: () => void;
@@ -214,6 +215,20 @@ export function useGameStore(): GameStore {
     ]);
   }, [state.targetScore, state.players]);
 
+  const rematch = useCallback(() => {
+    // Same as resetGame but jumps straight into PLAYING (no lobby step).
+    archivedKey.current = null;
+    setEvents([
+      {
+        type: "GAME_CONFIGURED",
+        targetScore: state.targetScore,
+        players: state.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
+        timestamp: now(),
+      },
+      { type: "GAME_STARTED", timestamp: now() },
+    ]);
+  }, [state.targetScore, state.players]);
+
   const clearPersistedGame = useCallback(() => {
     clearCurrent();
   }, []);
@@ -239,6 +254,7 @@ export function useGameStore(): GameStore {
     confirmTurn,
     resolveBust,
     resetGame,
+    rematch,
     undoLastEvent,
     canUndo: events.length > 1,
     clearPersistedGame,

@@ -131,7 +131,8 @@ export default function App() {
             winner={state.winner}
             targetScore={state.targetScore}
             round={state.round}
-            onReset={store.resetGame}
+            onRematch={store.rematch}
+            onNewGame={store.resetGame}
           />
         )}
       </AnimatePresence>
