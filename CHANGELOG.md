@@ -2,6 +2,12 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.3] — 2026-05-13
+
+### Agregado
+
+- **Splash de primera visita**: en el primer load aparece una pantalla con el logo de [Tom Consultor](https://tomconsultor.cl) ("Un desarrollo de...") por 3.5 segundos o hasta que el usuario toque la pantalla. Después se marca `dardos:intro-seen` en localStorage y nunca más vuelve a aparecer.
+
 ## [0.2.2] — 2026-05-13
 
 ### Cambiado

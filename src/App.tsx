@@ -10,9 +10,12 @@ import { MobileGame } from "./components/MobileGame";
 import { TVGame } from "./components/TVGame";
 import { BustScreen } from "./components/BustScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
+import { IntroScreen } from "./components/IntroScreen";
 import { useGameStore } from "./state/useGameStore";
 import { DartMultiplier } from "./engine/gameEngine";
 import { useKeyboard } from "./lib/keyboard";
+
+const INTRO_SEEN_KEY = "dardos:intro-seen";
 
 export default function App() {
   const store = useGameStore();
@@ -21,6 +24,22 @@ export default function App() {
   const [multiplier, setMultiplier] = useState<DartMultiplier>(1);
   const [isTvView, setIsTvView] = useState(false);
   const [isTurnLocked, setIsTurnLocked] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      return typeof window !== "undefined" && !window.localStorage.getItem(INTRO_SEEN_KEY);
+    } catch {
+      return false;
+    }
+  });
+
+  const dismissIntro = useCallback(() => {
+    try {
+      window.localStorage.setItem(INTRO_SEEN_KEY, "1");
+    } catch {
+      // ignore
+    }
+    setShowIntro(false);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setIsTvView(window.innerWidth > 1024);
@@ -83,6 +102,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-base relative overflow-hidden">
+      {showIntro && <IntroScreen onDismiss={dismissIntro} />}
+
       <AnimatePresence mode="wait">
         {state.status === "LOBBY" && (
           <motion.div
