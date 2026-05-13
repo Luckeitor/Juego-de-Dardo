@@ -235,20 +235,11 @@ function step(state: DerivedState, ev: GameEvent): DerivedState {
       return { ...state, status: "PLAYING", lastBustPlayer: undefined };
 
     case "GAME_WON": {
-      const winnerBase = state.players[state.currentPlayerIndex];
-      const winner = winnerBase
-        ? {
-            ...winnerBase,
-            score: ev.finalScore,
-            turnsPlayed: winnerBase.turnsPlayed + 1,
-            highestTurn: Math.max(winnerBase.highestTurn, ev.finalScore - winnerBase.score),
-          }
-        : undefined;
-      return {
-        ...state,
-        status: "VICTORY",
-        winner,
-      };
+      // Look up the winner by id from the event — currentPlayerIndex may have
+      // already advanced if TURN_CONFIRMED was applied first.
+      const winnerBase = state.players.find((p) => p.id === ev.playerId);
+      const winner = winnerBase ? { ...winnerBase, score: ev.finalScore } : undefined;
+      return { ...state, status: "VICTORY", winner };
     }
 
     case "GAME_RESET":
