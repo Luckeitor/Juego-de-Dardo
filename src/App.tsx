@@ -137,19 +137,21 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* View Toggle */}
-      <div className="fixed bottom-4 right-4 z-[60] flex gap-2">
-        <button
-          onClick={() => setIsTvView(!isTvView)}
-          className="bg-card/80 backdrop-blur-sm border border-white/10 p-3 rounded-full text-text-secondary hover:text-primary transition-colors flex items-center gap-2"
-          title="Cambiar vista controlador/TV"
-        >
-          <div className={`w-2 h-2 rounded-full ${isTvView ? "bg-primary" : "bg-red-500"}`} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">
-            {isTvView ? "MODO TV" : "MODO CONTROLADOR"}
-          </span>
-        </button>
-      </div>
+      {/* View Toggle — only visible during active gameplay or lobby */}
+      {(state.status === "LOBBY" || state.status === "PLAYING") && (
+        <div className="fixed bottom-4 right-4 z-[60] flex gap-2">
+          <button
+            onClick={() => setIsTvView(!isTvView)}
+            className="bg-card/80 backdrop-blur-sm border border-white/10 p-3 rounded-full text-text-secondary hover:text-primary transition-colors flex items-center gap-2"
+            title="Cambiar vista controlador/TV"
+          >
+            <div className={`w-2 h-2 rounded-full ${isTvView ? "bg-primary" : "bg-red-500"}`} />
+            <span className="text-[10px] font-bold uppercase tracking-widest">
+              {isTvView ? "MODO TV" : "MODO CONTROLADOR"}
+            </span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

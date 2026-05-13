@@ -29,7 +29,9 @@ export const BustScreen: React.FC<BustScreenProps> = ({ lastBustPlayer, onResume
         <h2 className="bebas text-4xl md:text-6xl tracking-wide">
           {lastBustPlayer} SE PASÓ
         </h2>
-        <p className="text-text-secondary text-xl font-medium">Turno anulado. El puntaje queda igual.</p>
+        <p className="text-text-secondary text-xl font-medium">
+          Solo el último dardo no contó. Los dardos anteriores del turno sí se suman.
+        </p>
       </div>
 
       <div className="pt-12">

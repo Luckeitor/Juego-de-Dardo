@@ -137,7 +137,10 @@ export function useGameStore(): GameStore {
       };
 
       if (outcome.kind === "BUST") {
-        append([dartEvent, { type: "TURN_BUSTED", playerId: player.id, timestamp: now() }]);
+        // House rule: only the bust dart is voided. Don't append DART_THROWN —
+        // the previous valid darts (already in state.currentTurnDarts) will be
+        // summed by the TURN_BUSTED reducer.
+        append({ type: "TURN_BUSTED", playerId: player.id, timestamp: now() });
         return { resultKind: "BUST" as const };
       }
 

@@ -2,11 +2,22 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.2] — 2026-05-13
+
+### Cambiado
+
+- **Regla de bust modificada** (regla casera): cuando un jugador se pasa con un dardo, ahora **solo ese dardo se anula**, los dardos anteriores del turno sí se suman al score. Antes se anulaba el turno completo (regla PDC oficial). Ejemplo: estabas en 260, tirás 20 + 10 + bust → quedás en 290 (no en 260).
+- Pantalla de Bust actualizada: ahora dice "Solo el último dardo no contó. Los dardos anteriores del turno sí se suman."
+
+### Corregido
+
+- Botones "REVANCHA" / "NUEVA PARTIDA" en pantalla de victoria quedaban tapados por el toggle flotante "MODO CONTROLADOR" en mobile. El toggle ahora se oculta en victoria/bust y se aumentó el margin-bottom de los botones.
+
 ## [0.2.1] — 2026-05-13
 
 ### Agregado
 
-- Auto-deploy continuo: cada push a `main` dispara un build en Netlify vía GitHub webhook → Netlify build hook. Deploy en ~60s sin intervención manual.
+- Auto-deploy continuo: cada push a `main` dispara GitHub Actions → build (`npm run lint && npm test && npm run build`) → deploy a Netlify. ~50s end-to-end con red de seguridad de tipos + tests.
 
 ## [0.2.0] — branch `feat/persistence-and-refactor` (2026-05-13)
 

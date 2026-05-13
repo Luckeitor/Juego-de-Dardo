@@ -209,12 +209,22 @@ function step(state: DerivedState, ev: GameEvent): DerivedState {
     }
 
     case "TURN_BUSTED": {
+      // House rule: only the bust dart is voided. The valid darts thrown earlier
+      // in the same turn still count. The store omits the bust DART_THROWN event,
+      // so currentTurnDarts contains only the valid darts when we get here.
+      const partial = sumDarts(state.currentTurnDarts);
+      const filledScores = state.currentTurnDarts
+        .filter((d): d is DartThrow => d !== null)
+        .map((d) => d.score);
+
       const updatedPlayers = state.players.map((p, i) => {
         if (i !== state.currentPlayerIndex) return p;
         return {
           ...p,
+          score: p.score + partial,
           turnsPlayed: p.turnsPlayed + 1,
-          history: [...p.history, []],
+          highestTurn: Math.max(p.highestTurn, partial),
+          history: [...p.history, filledScores],
         };
       });
       const nextIndex = (state.currentPlayerIndex + 1) % updatedPlayers.length;

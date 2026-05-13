@@ -150,19 +150,36 @@ test("TURN_CONFIRMED adds turnSum to player score and advances index", () => {
   assert.deepEqual(s.currentTurnDarts, [null, null, null]);
 });
 
-test("TURN_BUSTED voids the turn and advances to next player", () => {
+test("TURN_BUSTED with no prior darts keeps score at 0 (edge case: bust on dart 1)", () => {
   const events: GameEvent[] = [
     ...setup([player("a"), player("b")], 200),
     { type: "TURN_BUSTED", playerId: "a", timestamp: TS },
   ];
   const s = reduce(events);
-  assert.equal(s.players[0].score, 0, "score must stay at 0 after bust");
+  assert.equal(s.players[0].score, 0, "no prior darts → score stays 0");
   assert.equal(s.players[0].turnsPlayed, 1);
   assert.equal(s.players[0].history.length, 1);
-  assert.equal(s.players[0].history[0].length, 0, "history should mark the void turn");
+  assert.equal(s.players[0].history[0].length, 0);
   assert.equal(s.status, "BUST");
   assert.equal(s.lastBustPlayer, "a");
   assert.equal(s.currentPlayerIndex, 1);
+});
+
+test("TURN_BUSTED sums prior valid darts to player score (house rule)", () => {
+  // Tomás starts turn at 0, throws S20 (20), S10 (10), and the 3rd dart busts.
+  // Expected: score = 30 (the two valid darts), only the bust dart is voided.
+  const events: GameEvent[] = [
+    ...setup([player("a"), player("b")], 300),
+    dart("a", 20, 1),
+    dart("a", 10, 1),
+    { type: "TURN_BUSTED", playerId: "a", timestamp: TS },
+  ];
+  const s = reduce(events);
+  assert.equal(s.players[0].score, 30, "partial darts must be added to score");
+  assert.deepEqual(s.players[0].history[0], [20, 10], "history records only the valid darts");
+  assert.equal(s.players[0].highestTurn, 30);
+  assert.equal(s.status, "BUST");
+  assert.equal(s.currentPlayerIndex, 1, "still advances to next player");
 });
 
 test("BUST_ACKNOWLEDGED flips status back to PLAYING without changing scores", () => {

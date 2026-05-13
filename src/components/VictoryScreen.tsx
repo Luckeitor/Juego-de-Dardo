@@ -105,7 +105,7 @@ export const VictoryScreen: React.FC<VictoryScreenProps> = ({
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.75 }}
-          className="mt-10 mb-6 flex flex-col sm:flex-row gap-3 w-full max-w-md"
+          className="mt-10 mb-16 flex flex-col sm:flex-row gap-3 w-full max-w-md"
         >
           <Button onClick={onRematch} className="flex-1 px-8 py-4 bebas text-2xl md:text-3xl rounded-sm">
             REVANCHA
