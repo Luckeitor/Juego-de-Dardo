@@ -3,31 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { GameState, Player, NEON_COLORS } from "./types";
 import { Lobby } from "./components/Lobby";
 import { MobileGame } from "./components/MobileGame";
 import { TVGame } from "./components/TVGame";
 import { BustScreen } from "./components/BustScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
+import { useGameStore } from "./state/useGameStore";
+import { DartMultiplier } from "./engine/gameEngine";
 
 export default function App() {
-  const [gameState, setGameState] = useState<GameState>({
-    status: "LOBBY",
-    targetScore: 300,
-    players: [
-      { id: "1", name: "Tomás", color: NEON_COLORS[0], score: 0, history: [], turnsPlayed: 0, highestTurn: 0 },
-      { id: "2", name: "Ana", color: NEON_COLORS[1], score: 0, history: [], turnsPlayed: 0, highestTurn: 0 },
-      { id: "3", name: "Luis", color: NEON_COLORS[2], score: 0, history: [], turnsPlayed: 0, highestTurn: 0 },
-      { id: "4", name: "Carla", color: NEON_COLORS[3], score: 0, history: [], turnsPlayed: 0, highestTurn: 0 },
-    ],
-    currentPlayerIndex: 0,
-    currentTurnDarts: [null, null, null],
-    round: 1,
-  });
+  const store = useGameStore();
+  const { state } = store;
 
-  const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
+  const [multiplier, setMultiplier] = useState<DartMultiplier>(1);
   const [isTvView, setIsTvView] = useState(false);
   const [isTurnLocked, setIsTurnLocked] = useState(false);
 
@@ -38,192 +28,46 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const addPlayer = () => {
-    if (gameState.players.length >= 12) return;
-    const newId = Math.random().toString(36).slice(2, 11);
-    const newPlayer: Player = {
-      id: newId,
-      name: `Jugador ${gameState.players.length + 1}`,
-      color: NEON_COLORS[gameState.players.length % NEON_COLORS.length],
-      score: 0,
-      history: [],
-      turnsPlayed: 0,
-      highestTurn: 0,
-    };
-    setGameState((prev) => ({ ...prev, players: [...prev.players, newPlayer] }));
-  };
+  // Reset turn lock when status changes
+  useEffect(() => {
+    if (state.status !== "PLAYING") setIsTurnLocked(false);
+  }, [state.status]);
 
-  const removePlayer = (id: string) => {
-    setGameState((prev) => ({
-      ...prev,
-      players: prev.players.filter((p) => p.id !== id),
-    }));
-  };
-
-  const updatePlayerName = (id: string, name: string) => {
-    setGameState((prev) => ({
-      ...prev,
-      players: prev.players.map((p) => (p.id === id ? { ...p, name } : p)),
-    }));
-  };
-
-  const shufflePlayers = () => {
-    setGameState((prev) => ({
-      ...prev,
-      players: [...prev.players].sort(() => Math.random() - 0.5),
-    }));
-  };
-
-  const startGame = () => {
-    if (gameState.players.length < 2) return;
-    setGameState((prev) => ({ ...prev, status: "PLAYING" }));
-  };
-
-  const handleScoreInput = (value: number) => {
-    if (isTurnLocked) return;
-
-    const score = value * multiplier;
-    const newDarts = [...gameState.currentTurnDarts];
-    const emptyIndex = newDarts.indexOf(null);
-
-    if (emptyIndex !== -1) {
-      newDarts[emptyIndex] = score;
-
-      const turnSum = newDarts.reduce((a, b) => (a || 0) + (b || 0), 0) as number;
-      const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-      const nextTotal = currentPlayer.score + turnSum;
-
-      if (nextTotal > gameState.targetScore) {
-        setGameState((prev) => ({
-          ...prev,
-          currentTurnDarts: newDarts,
-          lastBustPlayer: currentPlayer.name,
-        }));
-        setTimeout(() => {
-          setGameState((prev) => ({ ...prev, status: "BUST" }));
-          setIsTurnLocked(false);
-        }, 500);
-        return;
-      }
-
-      setGameState((prev) => ({ ...prev, currentTurnDarts: newDarts }));
+  const handleScoreInput = useCallback(
+    (value: number) => {
+      if (isTurnLocked) return;
+      const result = store.throwDart(value, multiplier);
       setMultiplier(1);
-
-      if (emptyIndex === 2) {
-        setIsTurnLocked(true);
+      // If the user just filled the third dart, lock the turn for confirmation
+      // (the engine has already advanced state; we read post-throw state below)
+      if (result.resultKind === "CONTINUE") {
+        const filled = state.currentTurnDarts.filter((d) => d !== null).length;
+        // After dispatch, this throw added 1 dart, so check if it was the 3rd
+        if (filled === 2) setIsTurnLocked(true);
       }
-    }
-  };
+    },
+    [isTurnLocked, multiplier, store, state.currentTurnDarts]
+  );
 
-  const undoLastDart = () => {
-    if (isTurnLocked) {
-      setIsTurnLocked(false);
-    }
-    const newDarts = [...gameState.currentTurnDarts];
-    const lastFilledIndex = [...newDarts].reverse().findIndex((d) => d !== null);
-    if (lastFilledIndex !== -1) {
-      const realIndex = 2 - lastFilledIndex;
-      newDarts[realIndex] = null;
-      setGameState((prev) => ({ ...prev, currentTurnDarts: newDarts }));
-    }
-  };
+  const handleUndo = useCallback(() => {
+    if (isTurnLocked) setIsTurnLocked(false);
+    store.undoDart();
+  }, [isTurnLocked, store]);
 
-  const confirmTurn = useCallback(() => {
+  const handleConfirmTurn = useCallback(() => {
     if (!isTurnLocked) {
-      setIsTurnLocked(true);
+      const filled = state.currentTurnDarts.filter((d) => d !== null).length;
+      if (filled > 0) setIsTurnLocked(true);
       return;
     }
-
-    const turnSum = gameState.currentTurnDarts.reduce((a, b) => (a || 0) + (b || 0), 0) as number;
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    const nextTotal = currentPlayer.score + turnSum;
-
-    if (nextTotal === gameState.targetScore) {
-      const winner = {
-        ...currentPlayer,
-        score: nextTotal,
-        turnsPlayed: currentPlayer.turnsPlayed + 1,
-        highestTurn: Math.max(currentPlayer.highestTurn, turnSum),
-      };
-      setGameState((prev) => ({
-        ...prev,
-        status: "VICTORY",
-        winner,
-      }));
-      setIsTurnLocked(false);
-      return;
-    }
-
-    const updatedPlayers = gameState.players.map((p, i) => {
-      if (i === gameState.currentPlayerIndex) {
-        return {
-          ...p,
-          score: nextTotal,
-          turnsPlayed: p.turnsPlayed + 1,
-          highestTurn: Math.max(p.highestTurn, turnSum),
-          history: [...p.history, gameState.currentTurnDarts.filter((d) => d !== null) as number[]],
-        };
-      }
-      return p;
-    });
-
-    const nextIndex = (gameState.currentPlayerIndex + 1) % updatedPlayers.length;
-    const nextRound = nextIndex === 0 ? gameState.round + 1 : gameState.round;
-
-    setGameState((prev) => ({
-      ...prev,
-      players: updatedPlayers,
-      currentPlayerIndex: nextIndex,
-      currentTurnDarts: [null, null, null],
-      round: nextRound,
-    }));
+    store.confirmTurn();
     setIsTurnLocked(false);
-  }, [gameState, isTurnLocked]);
-
-  const resetGame = () => {
-    setGameState((prev) => ({
-      ...prev,
-      status: "LOBBY",
-      currentPlayerIndex: 0,
-      currentTurnDarts: [null, null, null],
-      round: 1,
-      players: prev.players.map((p) => ({ ...p, score: 0, history: [], turnsPlayed: 0, highestTurn: 0 })),
-    }));
-  };
-
-  const handleBustResume = () => {
-    const updatedPlayers = gameState.players.map((p, i) => {
-      if (i === gameState.currentPlayerIndex) {
-        return {
-          ...p,
-          turnsPlayed: p.turnsPlayed + 1,
-          history: [...p.history, []],
-        };
-      }
-      return p;
-    });
-
-    const nextIndex = (gameState.currentPlayerIndex + 1) % updatedPlayers.length;
-    const nextRound = nextIndex === 0 ? gameState.round + 1 : gameState.round;
-
-    setGameState((prev) => ({
-      ...prev,
-      status: "PLAYING",
-      players: updatedPlayers,
-      currentPlayerIndex: nextIndex,
-      currentTurnDarts: [null, null, null],
-      round: nextRound,
-    }));
-  };
-
-  const setTargetScore = (score: number) => {
-    setGameState((prev) => ({ ...prev, targetScore: score }));
-  };
+  }, [isTurnLocked, store, state.currentTurnDarts]);
 
   return (
     <div className="min-h-screen bg-base relative overflow-hidden">
       <AnimatePresence mode="wait">
-        {gameState.status === "LOBBY" && (
+        {state.status === "LOBBY" && (
           <motion.div
             key="lobby"
             initial={{ opacity: 0, x: -20 }}
@@ -231,51 +75,51 @@ export default function App() {
             exit={{ opacity: 0, x: 20 }}
           >
             <Lobby
-              gameState={gameState}
-              onAddPlayer={addPlayer}
-              onRemovePlayer={removePlayer}
-              onUpdatePlayerName={updatePlayerName}
-              onShufflePlayers={shufflePlayers}
-              onSetTargetScore={setTargetScore}
-              onStartGame={startGame}
+              gameState={state}
+              onAddPlayer={store.addPlayer}
+              onRemovePlayer={store.removePlayer}
+              onUpdatePlayerName={store.renamePlayer}
+              onShufflePlayers={store.shufflePlayers}
+              onSetTargetScore={store.setTargetScore}
+              onStartGame={store.startGame}
             />
           </motion.div>
         )}
 
-        {gameState.status === "PLAYING" && (
+        {state.status === "PLAYING" && (
           <motion.div key="game" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {isTvView ? (
-              <TVGame gameState={gameState} />
+              <TVGame gameState={state} />
             ) : (
               <MobileGame
-                gameState={gameState}
+                gameState={state}
                 multiplier={multiplier}
                 isTurnLocked={isTurnLocked}
                 onScoreInput={handleScoreInput}
                 onMultiplierChange={setMultiplier}
-                onUndo={undoLastDart}
-                onConfirmTurn={confirmTurn}
-                onExit={resetGame}
+                onUndo={handleUndo}
+                onConfirmTurn={handleConfirmTurn}
+                onExit={store.resetGame}
               />
             )}
           </motion.div>
         )}
 
-        {gameState.status === "BUST" && (
-          <BustScreen lastBustPlayer={gameState.lastBustPlayer} onResume={handleBustResume} />
+        {state.status === "BUST" && (
+          <BustScreen lastBustPlayer={state.lastBustPlayer} onResume={store.resolveBust} />
         )}
 
-        {gameState.status === "VICTORY" && gameState.winner && (
+        {state.status === "VICTORY" && state.winner && (
           <VictoryScreen
-            winner={gameState.winner}
-            targetScore={gameState.targetScore}
-            round={gameState.round}
-            onReset={resetGame}
+            winner={state.winner}
+            targetScore={state.targetScore}
+            round={state.round}
+            onReset={store.resetGame}
           />
         )}
       </AnimatePresence>
 
-      {/* View Toggle (Demo Helper) */}
+      {/* View Toggle */}
       <div className="fixed bottom-4 right-4 z-[60] flex gap-2">
         <button
           onClick={() => setIsTvView(!isTvView)}

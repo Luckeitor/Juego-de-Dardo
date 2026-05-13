@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import type { DartThrow } from "./engine/gameEngine";
 
 export type GameStatus = "LOBBY" | "PLAYING" | "BUST" | "VICTORY";
 
@@ -7,7 +7,7 @@ export interface Player {
   name: string;
   color: string;
   score: number;
-  history: number[][]; // [round][dartIndex]
+  history: number[][]; // [round][dartIndex] — flat scores for compactness
   turnsPlayed: number;
   highestTurn: number;
 }
@@ -17,7 +17,7 @@ export interface GameState {
   targetScore: number;
   players: Player[];
   currentPlayerIndex: number;
-  currentTurnDarts: (number | null)[]; // Max 3
+  currentTurnDarts: (DartThrow | null)[];
   lastBustPlayer?: string;
   winner?: Player;
   round: number;

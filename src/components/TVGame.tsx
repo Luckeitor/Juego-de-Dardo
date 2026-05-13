@@ -9,7 +9,7 @@ interface TVGameProps {
 
 export const TVGame: React.FC<TVGameProps> = ({ gameState }) => {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-  const turnSum = gameState.currentTurnDarts.reduce((a, b) => (a || 0) + (b || 0), 0) as number;
+  const turnSum = gameState.currentTurnDarts.reduce((a, d) => a + (d ? d.score : 0), 0);
   const highestTurn = gameState.players.reduce((max, p) => Math.max(max, p.highestTurn), 0);
   const topPlayer = [...gameState.players].sort((a, b) => b.score - a.score)[0];
 
@@ -112,12 +112,12 @@ export const TVGame: React.FC<TVGameProps> = ({ gameState }) => {
                   <span className="mono text-text-muted mr-auto font-bold uppercase text-xs">Dardo {i + 1}</span>
                   <AnimatePresence mode="wait">
                     <motion.span
-                      key={gameState.currentTurnDarts[i]}
+                      key={gameState.currentTurnDarts[i]?.score ?? "empty"}
                       initial={{ scale: 1.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       className="bebas text-5xl"
                     >
-                      {gameState.currentTurnDarts[i] ?? "—"}
+                      {gameState.currentTurnDarts[i]?.score ?? "—"}
                     </motion.span>
                   </AnimatePresence>
                   {gameState.currentTurnDarts[i] !== null && <Check className="text-primary ml-4" size={24} />}

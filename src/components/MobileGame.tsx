@@ -26,7 +26,7 @@ export const MobileGame: React.FC<MobileGameProps> = ({
 }) => {
   const currentPlayer = gameState.players[gameState.currentPlayerIndex];
   const nextPlayer = gameState.players[(gameState.currentPlayerIndex + 1) % gameState.players.length];
-  const turnSum = gameState.currentTurnDarts.reduce((a, b) => (a || 0) + (b || 0), 0) as number;
+  const turnSum = gameState.currentTurnDarts.reduce((a, d) => a + (d ? d.score : 0), 0);
   const isTurnComplete = !gameState.currentTurnDarts.includes(null);
 
   return (
@@ -100,7 +100,7 @@ export const MobileGame: React.FC<MobileGameProps> = ({
             >
               <span className="text-[10px] uppercase text-text-muted font-bold mb-1">Dardo {idx + 1}</span>
               <span className="bebas text-3xl">
-                {gameState.currentTurnDarts[idx] !== null ? gameState.currentTurnDarts[idx] : "—"}
+                {gameState.currentTurnDarts[idx] !== null ? gameState.currentTurnDarts[idx]!.score : "—"}
               </span>
             </div>
           ))}
