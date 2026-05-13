@@ -73,7 +73,7 @@ export const Lobby: React.FC<LobbyProps> = ({
       <div className="flex items-center justify-between mb-6">
         <h3 className="bebas text-2xl tracking-wider">JUGADORES ({gameState.players.length}/12)</h3>
         <Button variant="outline" onClick={onShufflePlayers} className="px-2 py-1 flex items-center gap-2">
-          <Shuffle size={14} /> <span className="text-xs">SHUFFLE</span>
+          <Shuffle size={14} /> <span className="text-xs">MEZCLAR</span>
         </Button>
       </div>
 

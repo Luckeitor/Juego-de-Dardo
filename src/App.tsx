@@ -12,6 +12,7 @@ import { BustScreen } from "./components/BustScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import { useGameStore } from "./state/useGameStore";
 import { DartMultiplier } from "./engine/gameEngine";
+import { useKeyboard } from "./lib/keyboard";
 
 export default function App() {
   const store = useGameStore();
@@ -51,8 +52,15 @@ export default function App() {
 
   const handleUndo = useCallback(() => {
     if (isTurnLocked) setIsTurnLocked(false);
-    store.undoDart();
-  }, [isTurnLocked, store]);
+    // If there are darts in the current turn, just undo the last dart.
+    // Otherwise, pop the last event from the log (undo previous turn / bust / etc.).
+    const hasDartInTurn = state.currentTurnDarts.some((d) => d !== null);
+    if (hasDartInTurn) {
+      store.undoDart();
+    } else {
+      store.undoLastEvent();
+    }
+  }, [isTurnLocked, store, state.currentTurnDarts]);
 
   const handleConfirmTurn = useCallback(() => {
     if (!isTurnLocked) {
@@ -63,6 +71,15 @@ export default function App() {
     store.confirmTurn();
     setIsTurnLocked(false);
   }, [isTurnLocked, store, state.currentTurnDarts]);
+
+  // Keyboard shortcuts (active only during PLAYING)
+  useKeyboard({
+    enabled: state.status === "PLAYING",
+    onScoreInput: handleScoreInput,
+    onMultiplierChange: setMultiplier,
+    onUndo: handleUndo,
+    onConfirm: handleConfirmTurn,
+  });
 
   return (
     <div className="min-h-screen bg-base relative overflow-hidden">
