@@ -1,0 +1,64 @@
+# Netlify build config for 180° Count-Up
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Skip rebuild when only docs change (saves build minutes).
+# Returns 0 = no build, 1 = build.
+[build.processing]
+  skip_processing = false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SPA fallback: all unknown paths return index.html so the React app handles
+# them. The app doesn't use client-side routing today, but this prevents 404s
+# if a user refreshes on a deep link (or shares one).
+# ─────────────────────────────────────────────────────────────────────────────
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Headers
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Service worker must never be cached by the browser — otherwise users get
+# stuck on an old version of the app forever.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# PWA manifest needs the correct MIME type for some browsers.
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+# Hashed assets (Vite output) can be cached aggressively — the filename
+# changes on every build.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Icons are stable enough to cache for a day.
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Security headers for all responses.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
