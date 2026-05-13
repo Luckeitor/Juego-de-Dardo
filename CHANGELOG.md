@@ -2,7 +2,13 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Unreleased] — branch `feat/persistence-and-refactor` (2026-05-13)
+## [0.2.1] — 2026-05-13
+
+### Agregado
+
+- Auto-deploy continuo: cada push a `main` dispara un build en Netlify vía GitHub webhook → Netlify build hook. Deploy en ~60s sin intervención manual.
+
+## [0.2.0] — branch `feat/persistence-and-refactor` (2026-05-13)
 
 ### Agregado
 
