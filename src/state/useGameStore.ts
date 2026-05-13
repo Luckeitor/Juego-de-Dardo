@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   DartMultiplier,
   DartThrow,
@@ -11,6 +11,7 @@ import {
   sumDarts,
 } from "../engine/gameEngine";
 import { NEON_COLORS } from "../types";
+import { archiveGame, clearCurrent, loadEvents, saveEvents } from "../lib/storage";
 
 const newId = (): string => Math.random().toString(36).slice(2, 11);
 
@@ -36,12 +37,34 @@ export interface GameStore {
   // Time travel
   undoLastEvent: () => void;
   canUndo: boolean;
+
+  // Persistence
+  clearPersistedGame: () => void;
 }
 
 export function useGameStore(): GameStore {
-  const [events, setEvents] = useState<GameEvent[]>(() => initialEvents());
+  const [events, setEvents] = useState<GameEvent[]>(() => {
+    const persisted = loadEvents();
+    if (persisted && persisted.length > 0) return persisted;
+    return initialEvents();
+  });
 
   const state = useMemo(() => reduce(events), [events]);
+
+  // Persist every event change.
+  useEffect(() => {
+    saveEvents(events);
+  }, [events]);
+
+  // Archive on victory (once per game).
+  const archivedKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (state.status !== "VICTORY") return;
+    const key = `${events.length}:${events[events.length - 1]?.timestamp ?? ""}`;
+    if (archivedKey.current === key) return;
+    archivedKey.current = key;
+    archiveGame(events);
+  }, [state.status, events]);
 
   const append = useCallback((ev: GameEvent | GameEvent[]) => {
     setEvents((prev) => [...prev, ...(Array.isArray(ev) ? ev : [ev])]);
@@ -178,8 +201,22 @@ export function useGameStore(): GameStore {
   }, [append]);
 
   const resetGame = useCallback(() => {
-    append({ type: "GAME_RESET", timestamp: now() });
-  }, [append]);
+    // Hard-reset the event log to keep it bounded.
+    // We snapshot the current players/target so the next match keeps the lobby intact.
+    archivedKey.current = null;
+    setEvents([
+      {
+        type: "GAME_CONFIGURED",
+        targetScore: state.targetScore,
+        players: state.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
+        timestamp: now(),
+      },
+    ]);
+  }, [state.targetScore, state.players]);
+
+  const clearPersistedGame = useCallback(() => {
+    clearCurrent();
+  }, []);
 
   const undoLastEvent = useCallback(() => {
     setEvents((prev) => {
@@ -204,5 +241,6 @@ export function useGameStore(): GameStore {
     resetGame,
     undoLastEvent,
     canUndo: events.length > 1,
+    clearPersistedGame,
   };
 }
