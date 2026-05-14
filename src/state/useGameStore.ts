@@ -12,6 +12,7 @@ import {
 } from "../engine/gameEngine";
 import { NEON_COLORS } from "../types";
 import { archiveGame, clearCurrent, loadEvents, saveEvents } from "../lib/storage";
+import { track } from "../lib/analytics";
 
 const newId = (): string => Math.random().toString(36).slice(2, 11);
 
@@ -112,7 +113,11 @@ export function useGameStore(): GameStore {
   const startGame = useCallback(() => {
     if (state.players.length < 2) return;
     append({ type: "GAME_STARTED", timestamp: now() });
-  }, [state.players.length, append]);
+    track("game_started", {
+      target_score: state.targetScore,
+      player_count: state.players.length,
+    });
+  }, [state.players.length, state.targetScore, append]);
 
   // ── Game ────────────────────────────────────────────────────────────────
   const throwDart = useCallback(
@@ -140,7 +145,16 @@ export function useGameStore(): GameStore {
         // House rule: only the bust dart is voided. Don't append DART_THROWN —
         // the previous valid darts (already in state.currentTurnDarts) will be
         // summed by the TURN_BUSTED reducer.
+        const priorDarts = state.currentTurnDarts.filter((d) => d !== null).length;
+        const priorScore = sumDarts(state.currentTurnDarts);
         append({ type: "TURN_BUSTED", playerId: player.id, timestamp: now() });
+        track("bust", {
+          target_score: state.targetScore,
+          prior_darts: priorDarts,
+          prior_score: priorScore,
+          attempted_dart_value: value,
+          attempted_dart_multiplier: multiplier,
+        });
         return { resultKind: "BUST" as const };
       }
 
@@ -182,6 +196,12 @@ export function useGameStore(): GameStore {
           timestamp: now(),
         },
       ]);
+      track("game_won", {
+        target_score: state.targetScore,
+        winner_turns: player.turnsPlayed + 1,
+        round: state.round,
+        player_count: state.players.length,
+      });
       return { resultKind: "VICTORY" as const };
     }
 
@@ -230,6 +250,10 @@ export function useGameStore(): GameStore {
       },
       { type: "GAME_STARTED", timestamp: now() },
     ]);
+    track("rematch", {
+      target_score: state.targetScore,
+      player_count: state.players.length,
+    });
   }, [state.targetScore, state.players]);
 
   const clearPersistedGame = useCallback(() => {

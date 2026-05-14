@@ -2,6 +2,20 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.7] — 2026-05-13
+
+### Agregado
+
+- **Eventos custom** pusheados al `dataLayer` para tracking en GA4 vía GTM:
+  - `intro_dismissed` — usuario cierra el splash de Tomconsultor.
+  - `game_started` — `target_score`, `player_count`.
+  - `bust` — `target_score`, `prior_darts`, `prior_score`, `attempted_dart_value`, `attempted_dart_multiplier`.
+  - `game_won` — `target_score`, `winner_turns`, `round`, `player_count`.
+  - `rematch` — `target_score`, `player_count`.
+  - `pwa_install_available` — el browser ofrece instalar (Chrome/Android).
+  - `pwa_installed` — usuario instaló la app.
+- `src/lib/analytics.ts`: wrapper `track(event, params)` con guard SSR y manejo de error silencioso.
+
 ## [0.2.6] — 2026-05-13
 
 ### Agregado

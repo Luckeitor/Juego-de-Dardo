@@ -14,6 +14,7 @@ import { IntroScreen } from "./components/IntroScreen";
 import { useGameStore } from "./state/useGameStore";
 import { DartMultiplier } from "./engine/gameEngine";
 import { useKeyboard } from "./lib/keyboard";
+import { track } from "./lib/analytics";
 
 const INTRO_SEEN_KEY = "dardos:intro-seen";
 
@@ -39,6 +40,19 @@ export default function App() {
       // ignore
     }
     setShowIntro(false);
+    track("intro_dismissed");
+  }, []);
+
+  // Track PWA install events (Android/Chromium) so we can measure conversion.
+  useEffect(() => {
+    const onInstalled = () => track("pwa_installed");
+    const onPromptAvailable = () => track("pwa_install_available");
+    window.addEventListener("appinstalled", onInstalled);
+    window.addEventListener("beforeinstallprompt", onPromptAvailable);
+    return () => {
+      window.removeEventListener("appinstalled", onInstalled);
+      window.removeEventListener("beforeinstallprompt", onPromptAvailable);
+    };
   }, []);
 
   useEffect(() => {
