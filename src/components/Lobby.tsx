@@ -1,5 +1,5 @@
 import type React from "react";
-import { Plus, Trash2, Shuffle, Target } from "lucide-react";
+import { Plus, Trash2, Shuffle, Target, Pencil } from "lucide-react";
 import { GameState } from "../types";
 import { Button } from "./ui/Button";
 
@@ -70,12 +70,19 @@ export const Lobby: React.FC<LobbyProps> = ({
 
     {/* Players List */}
     <div className="w-full lg:w-[400px] bg-surface rounded-sm border border-white/5 p-6 flex flex-col">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h3 className="bebas text-2xl tracking-wider">JUGADORES ({gameState.players.length}/12)</h3>
         <Button variant="outline" onClick={onShufflePlayers} className="px-2 py-1 flex items-center gap-2">
           <Shuffle size={14} /> <span className="text-xs">MEZCLAR</span>
         </Button>
       </div>
+
+      <p className="text-text-muted text-xs mb-5 flex items-center gap-1.5">
+        <Pencil size={12} className="text-primary/60" />
+        <span>
+          Tocá un nombre para <span className="text-text-secondary">cambiarlo</span>
+        </span>
+      </p>
 
       <div className="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
         {gameState.players.map((player, idx) => (

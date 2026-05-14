@@ -2,6 +2,12 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.9] — 2026-05-13
+
+### Agregado
+
+- **Hint editable en el lobby**: arriba de la lista de jugadores ahora se muestra un texto sutil con icono de lápiz: "Tocá un nombre para cambiarlo". Aclara que los nombres son editables sin saturar la UI.
+
 ## [0.2.8] — 2026-05-13
 
 ### Corregido
