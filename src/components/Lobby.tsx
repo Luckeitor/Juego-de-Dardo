@@ -79,9 +79,12 @@ export const Lobby: React.FC<LobbyProps> = ({
 
       <div className="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
         {gameState.players.map((player, idx) => (
-          <div key={player.id} className="flex items-center gap-3 bg-card p-3 rounded-sm border border-white/5 group">
+          <div
+            key={player.id}
+            className="flex items-center gap-4 bg-card p-3 pl-4 pr-2 rounded-sm border border-white/5"
+          >
             <div
-              className="w-10 h-10 flex items-center justify-center rounded-sm font-bold bebas text-xl"
+              className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-sm bebas text-2xl leading-none"
               style={{ backgroundColor: player.color, color: "#000" }}
             >
               {idx + 1}
@@ -89,13 +92,14 @@ export const Lobby: React.FC<LobbyProps> = ({
             <input
               value={player.name}
               onChange={(e) => onUpdatePlayerName(player.id, e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none font-bold focus:text-primary transition-colors h-10"
+              className="flex-1 min-w-0 bg-transparent border-none outline-none font-bold focus:text-primary transition-colors h-12"
             />
             <button
               onClick={() => onRemovePlayer(player.id)}
-              className="text-text-muted hover:text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label={`Eliminar ${player.name}`}
+              className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-sm text-text-muted hover:text-secondary hover:bg-secondary/10 active:scale-95 transition-all"
             >
-              <Trash2 size={16} />
+              <Trash2 size={18} />
             </button>
           </div>
         ))}

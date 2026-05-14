@@ -2,6 +2,17 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.4] — 2026-05-13
+
+### Cambiado
+
+- **Tarjeta de jugador en el lobby** rediseñada para tablet/mobile:
+  - Número del jugador en cuadrado más grande (40→48px) con más aire interno.
+  - Espaciado generoso entre el número y el nombre (gap-3 → gap-4).
+  - Botón de eliminar (🗑️) **siempre visible** (antes era hover-only, invisible en touch).
+  - El botón eliminar ahora tiene 40×40px y feedback de tap (active:scale-95).
+- **Nombres por default** actualizados: Tomi, Coti, Blanca, Amalia (eran Tomás, Ana, Luis, Carla).
+
 ## [0.2.3] — 2026-05-13
 
 ### Agregado

@@ -71,10 +71,10 @@ export const createPlayer = (id: string, name: string, color: string): Player =>
 
 export const initialEvents = (): GameEvent[] => {
   const defaults = [
-    { id: "p1", name: "Tomás" },
-    { id: "p2", name: "Ana" },
-    { id: "p3", name: "Luis" },
-    { id: "p4", name: "Carla" },
+    { id: "p1", name: "Tomi" },
+    { id: "p2", name: "Coti" },
+    { id: "p3", name: "Blanca" },
+    { id: "p4", name: "Amalia" },
   ];
   return [
     {
