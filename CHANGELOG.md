@@ -2,6 +2,12 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.6] — 2026-05-13
+
+### Agregado
+
+- **Google Tag Manager** (container `GTM-NZT58RD3`) instalado en `<head>` y noscript fallback en `<body>` para tracking de eventos vía GTM.
+
 ## [0.2.5] — 2026-05-13
 
 ### Agregado
