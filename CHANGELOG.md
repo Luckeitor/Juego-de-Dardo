@@ -2,6 +2,20 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.5] — 2026-05-13
+
+### Agregado
+
+- **SEO completo**:
+  - `<title>` y meta description optimizados para "Marcador de Dardos a Medida — TomConsultor".
+  - **Open Graph** completo (og:title, og:description, og:image, og:url, og:type, og:locale es_CL).
+  - **Twitter Card** summary_large_image.
+  - **Schema.org JSON-LD** WebApplication con creator=TomConsultor.
+  - `<link rel="canonical">` apuntando a `https://dardos.smx.cl/`.
+- **og-image.svg** 1200×630 con título de la app + dartboard + branding TomConsultor + URL.
+- **robots.txt** permitiendo indexación con referencia al sitemap.
+- **sitemap.xml** con la URL principal.
+
 ## [0.2.4] — 2026-05-13
 
 ### Cambiado
