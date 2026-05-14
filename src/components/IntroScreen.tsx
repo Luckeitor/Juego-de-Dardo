@@ -66,7 +66,7 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onDismiss }) => {
               transition={{ delay: 1.5, duration: 0.6 }}
               className="text-text-muted text-[10px] md:text-xs tracking-[4px] uppercase"
             >
-              Tocá para continuar
+              Toca para continuar
             </motion.span>
           </motion.div>
         </motion.div>

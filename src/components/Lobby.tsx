@@ -80,7 +80,7 @@ export const Lobby: React.FC<LobbyProps> = ({
       <p className="text-text-muted text-xs mb-5 flex items-center gap-1.5">
         <Pencil size={12} className="text-primary/60" />
         <span>
-          Tocá un nombre para <span className="text-text-secondary">cambiarlo</span>
+          Toca un nombre para <span className="text-text-secondary">cambiarlo</span>
         </span>
       </p>
 
@@ -123,7 +123,7 @@ export const Lobby: React.FC<LobbyProps> = ({
 
       <div className="mt-8 space-y-4">
         {gameState.players.length < 2 && (
-          <p className="text-secondary text-xs text-center font-bold">Necesitás al menos 2 jugadores para empezar</p>
+          <p className="text-secondary text-xs text-center font-bold">Necesitas al menos 2 jugadores para empezar</p>
         )}
         <button
           onClick={onStartGame}

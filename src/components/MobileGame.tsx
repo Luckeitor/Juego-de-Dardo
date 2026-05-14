@@ -134,7 +134,7 @@ export const MobileGame: React.FC<MobileGameProps> = ({
               </div>
               <h3 className="bebas text-5xl tracking-tight mb-2">¡TURNO LISTO!</h3>
               <p className="text-text-secondary text-base mb-8 uppercase tracking-widest font-bold">
-                Pasale el dispositivo a <span className="text-white">{nextPlayer.name}</span>
+                Pásale el dispositivo a <span className="text-white">{nextPlayer.name}</span>
               </p>
 
               <motion.button
