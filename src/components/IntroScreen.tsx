@@ -54,9 +54,9 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onDismiss }) => {
 
             <div className="w-full max-w-[320px] md:max-w-[420px]">
               <img
-                src="/tomconsultor.svg"
+                src="/tomconsultor-dark.svg"
                 alt="Tom Consultor"
-                className="w-full h-auto drop-shadow-[0_0_24px_rgba(0,255,136,0.15)]"
+                className="w-full h-auto drop-shadow-[0_0_24px_rgba(255,138,80,0.25)]"
               />
             </div>
 

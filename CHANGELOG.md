@@ -2,6 +2,12 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.8] — 2026-05-13
+
+### Corregido
+
+- Logo de Tom Consultor en el splash de intro era prácticamente invisible: el SVG original tenía texto en `#111111` (negro) y `#404040` (gris oscuro) que sobre fondo dark `#0A0E14` no se leía. Se creó `public/tomconsultor-dark.svg` con texto blanco y llaves en un orange más vibrante (`#FF8A50` vs `#C96442`). El IntroScreen usa la variante dark.
+
 ## [0.2.7] — 2026-05-13
 
 ### Agregado

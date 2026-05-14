@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 140" role="img" aria-label="Tom Consultor — mentoría en Claude AI">
+  <title>Tom Consultor</title>
+  <desc>Logo Tom Consultor en versión dark-mode: llaves Claude Orange + wordmark tom + descriptor consultor + tagline mentoría en claude ai</desc>
+
+  <defs>
+    <style>
+      .brace { font-family: 'Inter', system-ui, sans-serif; font-weight: 200; fill: #FF8A50; }
+      .word  { font-family: 'Inter', system-ui, sans-serif; font-weight: 800; fill: #FFFFFF; letter-spacing: -2px; }
+      .desc  { font-family: 'Inter', system-ui, sans-serif; font-weight: 400; fill: #FFFFFF; letter-spacing: 3.5px; text-transform: uppercase; }
+      .tag   { font-family: 'Inter', system-ui, sans-serif; font-weight: 400; fill: #B8C0CC; letter-spacing: 1px; }
+      .dot   { fill: #FF8A50; }
+    </style>
+  </defs>
+
+  <!-- Llaves + wordmark -->
+  <g transform="translate(20, 78)">
+    <text class="brace" x="0"   y="0" font-size="72">{</text>
+    <text class="word"  x="44"  y="0" font-size="60">tom</text>
+    <text class="brace" x="186" y="0" font-size="72">}</text>
+  </g>
+
+  <!-- Descriptor -->
+  <text class="desc" x="20" y="108" font-size="13">CONSULTOR</text>
+
+  <!-- Tagline con dot Orange -->
+  <circle class="dot" cx="135" cy="104" r="2.5"/>
+  <text class="tag" x="143" y="108" font-size="11">mentoría en claude ai</text>
+</svg>
