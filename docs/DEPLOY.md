@@ -127,10 +127,13 @@ Mismo flow que Netlify: **Pages → Create project → Connect to Git → selecc
 ## Notas sobre el service worker
 
 - El service worker **solo se registra en producción** (`import.meta.env.PROD`). En dev, Vite usa HMR y un SW activo rompería el flow.
-- Después del primer deploy, los visitantes guardarán la app cacheada. **Si cambiás el código, hay que invalidar el cache**:
-  - El nombre del cache está hardcoded a `dardos-v1` en `public/sw.js`.
-  - Para forzar refresh: cambiá a `dardos-v2` antes de buildear. El `activate` handler borra caches viejos automáticamente.
-- En desarrollo de producción, abrí Chrome DevTools → Application → Service Workers → **Unregister** para empezar limpio.
+- Estrategia por tipo de request (`public/sw.js`):
+  - **HTML / navegaciones → network-first**, cache solo como fallback offline. El `index.html` es el único entry point sin hash: si se sirve desde cache después de un deploy, referencia bundles que ya no existen en el CDN y la app queda en blanco.
+  - **`/assets/*` → cache-first**. Vite hashea los nombres, así que un hit siempre es correcto.
+  - **Iconos / manifest → stale-while-revalidate**.
+  - Cross-origin (GTM, etc.) no se intercepta.
+- El nombre del cache (`dardos-v2`) solo hay que subirlo si cambia la lógica de cacheo. Al activarse un SW nuevo, se borran los caches viejos y se recargan las pestañas abiertas una vez, así un usuario pegado en una versión rota se recupera solo.
+- Para empezar limpio en local: Chrome DevTools → Application → Service Workers → **Unregister** + Application → Storage → **Clear site data**.
 
 ## Headers de seguridad (opcional pero recomendado)
 

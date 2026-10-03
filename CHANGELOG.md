@@ -2,6 +2,13 @@
 
 Todos los cambios notables del proyecto se documentan acá. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [0.2.10] — 2026-10-03
+
+### Corregido
+
+- **Pantalla en blanco para visitantes recurrentes después de cada deploy** (el sitio parecía caído). El service worker servía `index.html` cache-first con cache fijo `dardos-v1`: tras un deploy nuevo, el HTML cacheado pedía un bundle `/assets/index-*.js` que ya no existía en Netlify (404) y la app no cargaba. Como `sw.js` no cambiaba, el navegador nunca actualizaba el SW y el usuario quedaba pegado. Ahora el HTML es network-first (cache solo offline), los assets hasheados cache-first, el cache sube a `dardos-v2` y al activarse el SW nuevo recarga las pestañas abiertas para recuperar a los afectados.
+- Workflow de deploy: permisos `deployments: write` y `statuses: write` para que `actions-netlify` deje de loguear 403 al publicar el estado en GitHub.
+
 ## [0.2.9] — 2026-05-13
 
 ### Agregado
