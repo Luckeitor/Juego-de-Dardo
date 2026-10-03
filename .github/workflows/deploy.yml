@@ -12,6 +12,10 @@ concurrency:
 
 permissions:
   contents: read
+  # nwtgck/actions-netlify posts a GitHub Deployment + commit status after
+  # publishing. Without these it logs two 403s per run (deploy still succeeds).
+  deployments: write
+  statuses: write
 
 jobs:
   deploy:
